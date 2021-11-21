@@ -3,13 +3,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
-from sklearn.model_selection import train_test_split
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
+from fuzzywuzzy import process
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import CountVectorizer
+
+
 
 
 
@@ -67,7 +69,54 @@ def remove_punctuation(text):
     text = " ".join(text)
     return text
 
-# 
+# Data Preprocessing
+
+def combine_features(data):
+    features=[]
+    for i in range(0, data.shape[0]):
+        features.append( data['series_tokenized'][i] + ' ' + data['desccription_tokenized'][i] + ' ' + data['series_tokenized'][i])
+    return features
+
+#Model
+
+#UserInput Title recommendations
+def suggestions_user_input(title_user):
+    choices = df1['title'] 
+    # Get a list of matches ordered by score, default limit to 5
+    rec = process.extract(title_user, choices)
+    print('This exact title was not found in the database. Did you mean one of these?')
+    for i in rec:
+        print(i[0])
+
+#Book Recommendations based on Wordcount
+
+def give_recommendationCount(title_user):
+    try:
+        #1.Step - convert the description from combined_features to a matrix of word counts
+        cm = CountVectorizer().fit_transform(df1['combined_features'])
+        #2.Get the cosine_simmilarity from the count matrix
+        cs = cosine_similarity(cm)
+        #Get index of title of user input
+        indices = df1[df1.title == title_user].index.values[0]
+        #Create a list of tuples in the form (index,similarity)
+        scores = list(enumerate(cs[indices]))
+        # Sort the list of similar books in descending order
+        sorted_score = sorted(scores, key=lambda x:x[1], reverse=True)
+        sorted_score = sorted_score[1:]
+        # Create a loop to print the first 5 books from the sorted list
+        j=0
+        print('The 5 most recommended books to '+title_user+' are:\n')
+        for item in sorted_score:
+            book_title = df1[df1.index == item[0]]['title'].values[0]
+            print(j+1, book_title)
+            j=j+1
+            if j >=5:
+                break
+            #return 'The 5 most recommended books to '+title_user+' are:\n'
+    except:
+        suggestions_user_input(title_user)
+
+
 
 
 
