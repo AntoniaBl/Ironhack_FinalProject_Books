@@ -18,10 +18,10 @@ st.image(image, use_column_width=True)
 
 #Inputs 
 st.sidebar.header('User Input Features')
-no_ratings =st.sidebar.slider('Sum of Ratings',0,0,6000000)
-rating = st.sidebar.slider('Rating',0,3,5)
-year = st.sidebar.slider('Year', 1920, 1990,2021) #lowest value, default value, highest value
-pages = st.sidebar.slicer('Pages', 0,350,27500) #select only maximum pages
+#no_ratings =st.sidebar.slider('Sum of Ratings',0,0,6000000)
+#rating = st.sidebar.slider('Rating',0,3,5)
+#year = st.sidebar.slider('Year', 1920, 1990,2021) #lowest value, default value, highest value
+#pages = st.sidebar.slicer('Pages', 0,350,27500) #select only maximum pages
 
 #unique_genres = sorted(data.genres.unique()) #data=loadeddata, column genres
 #genres = st.sidebar.multiselect('Genres',unique_genres, unique_genres)
@@ -30,25 +30,29 @@ col1, col2 = st.columns(2)
 with col1:
     #genre=st.chooseoption#####
     title_user = st.text_input('Title', 'Enter Title')
-with col2:
+#with col2:
     #author = st.text_input('Author', 'Enter Author')
     #series = st.text_input('Series','Enter Series')
     
 
  #store inputs in dictionary
-user = pd.DataFrame({'sum of ratings': no_ratings, 'year':year,'rating':rating,'pages':pages}) #'author':author,series':series,'title': title_user}, index=[0])
 
-st.write("The user input is:")
-st.table(user)
+#user = pd.DataFrame({'sum of ratings': no_ratings, 'year':year,'rating':rating,'pages':pages}) #'author':author,series':series,'title': title_user}, index=[0])
+
+#st.write("The user input is:")
+#st.table(user)
 
 #Define Model Functions:
 def suggestions_other_title(title_user):
     choices = df1['title'] 
     # Get a list of matches ordered by score, default limit to 5
     rec = process.extract(title_user, choices)
-    print('This exact title was not found in the database. Did you mean one of these?')
+    str1=''
+    #print()
     for i in rec:
-        print(i[0])
+        str1 +=(i[0])
+    suggestions = str("This exact title was not found in the database. Did you mean one of these?\n"+str(str1)+"\n")
+    return suggestions
 
 def give_5bookrecommendationsCount(title_user):
     #1.Step - convert the description from combined_features to a matrix of word counts
@@ -64,13 +68,15 @@ def give_5bookrecommendationsCount(title_user):
     sorted_score = sorted_score[1:]
     # Create a loop to print the first 5 books from the sorted list
     j=0
-    print('The 5 most recommended books to '+title_user+' are:\n')
+    #print('The 5 most recommended books to '+title_user+' are:\n')
+    str2=''
     for item in sorted_score:
         book_title = df1[df1.index == item[0]]['title'].values[0]
-        print(j+1, book_title)
+        str2+=(str(j+1)+' ' + book_title + "\n")
+        #print(j+1, book_title)
         j=j+1
         if j >=5:
-            break
+            return 'The 5 most recommended books to '+str(title_user)+' are:\n' + str(str2)
 
 def assume_book_title(title_user):
     choices = df1['title'] 
@@ -82,33 +88,42 @@ def assume_book_title(title_user):
         #print(i[1])
         if lst[0]>95:
             title_user=i[0]#list.sort(key=lst, reverse=True)
-            print('I did not find an exact match in the database. I assume you mean the book: ' + title_user)
-            give_5bookrecommendationsCount(title_user)
-            break
+            return 'I did not find an exact match in the database. I assume you mean the book: ' + title_user +give_5bookrecommendationsCount(title_user)
         else:
             error
 
+
 def give_recommendationComplete(title_user):
     try:
-        give_5bookrecommendationsCount(title_user)
+        #print(1)
+        a = give_5bookrecommendationsCount(title_user)
+        if a:
+            return a
     except:
         try:
-            assume_book_title(title_user)
+            #print(2)
+            b = assume_book_title(title_user)
+            if b:
+                return b 
         except:
-            suggestions_other_title(title_user)       
+            #print(3)
+            c= suggestions_other_title(title_user) 
+            if c:
+                return c       
     
 
 
-
+recommendation =0
 if st.button('Predict'):
     df1=pd.read_csv('DataFinal\DataPreprocessed.csv',index_col=0)
     #reset index
     df1.reset_index(drop=True, inplace=True)
-    give_recommendationComplete(title_user)
-else:
-    break
+    recommendation = give_recommendationComplete(title_user)
 
-    
+
+#Print recommendations
+
+st.write(recommendation)
 
     #include: if input= empty procees with model
 
