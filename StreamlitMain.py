@@ -9,40 +9,16 @@ from sklearn.metrics.pairwise import linear_kernel
 import Functions_Books as funct
 from fuzzywuzzy import process
 
-#store the dataframe to use in the same folder
-
+#1. Header
 st.write('# No worries. He knows what you want to read next.')
-
 image = Image.open('image.jpeg') #save in the same folder
 st.image(image, use_column_width=True)
 
-#Inputs 
-st.sidebar.header('User Input Features')
-#no_ratings =st.sidebar.slider('Sum of Ratings',0,0,6000000)
-#rating = st.sidebar.slider('Rating',0,3,5)
-#year = st.sidebar.slider('Year', 1920, 1990,2021) #lowest value, default value, highest value
-#pages = st.sidebar.slicer('Pages', 0,350,27500) #select only maximum pages
+title_user = st.text_input('Please enter a title', '')
+recommendation =''
 
-#unique_genres = sorted(data.genres.unique()) #data=loadeddata, column genres
-#genres = st.sidebar.multiselect('Genres',unique_genres, unique_genres)
 
-col1, col2 = st.columns(2)
-with col1:
-    #genre=st.chooseoption#####
-    title_user = st.text_input('Title', 'Enter Title')
-#with col2:
-    #author = st.text_input('Author', 'Enter Author')
-    #series = st.text_input('Series','Enter Series')
-    
-
- #store inputs in dictionary
-
-#user = pd.DataFrame({'sum of ratings': no_ratings, 'year':year,'rating':rating,'pages':pages}) #'author':author,series':series,'title': title_user}, index=[0])
-
-#st.write("The user input is:")
-#st.table(user)
-
-#Define Model Functions:
+#2. Define Model Functions:
 def suggestions_other_title(title_user):
     choices = df1['title'] 
     # Get a list of matches ordered by score, default limit to 5
@@ -77,7 +53,7 @@ def give_5bookrecommendationsCount(title_user):
         j=j+1
         if j >=5:
             return 'The 5 most recommended books to '+str(title_user)+' are:\n' + str(str2)
-
+#For Genre,Author:After explode do list and append only if title is not yet in list, if len(list) = 5 dann return
 def assume_book_title(title_user):
     choices = df1['title'] 
     # Get a list of matches ordered by score, default limit to 5
@@ -112,23 +88,87 @@ def give_recommendationComplete(title_user):
                 return c       
     
 
-
-recommendation =0
+#3. Gice and Print recommendations
 if st.button('Predict'):
-    df1=pd.read_csv('DataFinal\DataPreprocessed.csv',index_col=0)
+    df1=pd.read_csv('DataFinal\DataPreprocessed.csv',index_col=0) #or feature output df, either filtered or original
     #reset index
     df1.reset_index(drop=True, inplace=True)
     recommendation = give_recommendationComplete(title_user)
-
-
-#Print recommendations
-
+       
 st.write(recommendation)
+ #include: if input= empty procees with model + link of book cover  + new lines
 
-    #include: if input= empty procees with model
+
+#4. Feature inputs Average_rating, total_ratings, pages
+st.sidebar.header('User Input Features')
+with st.form(key ='Form1'): # if still needed, else do st.sidebar everywhere
+    with st.sidebar:
+        #author = st.text_input('Author', '')  
+        no_ratings =st.slider('Popularity: Minimum No of total Ratings',0,1000000,0)        #no ratings = st.number_input('Maximum number of tweets', 100)
+        rating =st.slider('Rating',0.0,5.0,(0.0,5.0)) 
+        pages = st.number_input('Maximum number of pages', 0)
+        #unique_genres = sorted(df1.genres.unique()) #data=loadeddata, column genres
+        #genres = st.sidebar.multiselect('Genres',unique_genres, unique_genres)
+        #Vorher explode, dann in Model
+        submitted1 = st.form_submit_button(label = 'Apply selection')
 
 
-#Predict
+if submitted1:
+    dfo=pd.read_csv('DataFinal\DataPreprocessed.csv',index_col=0)
+    #reset index
+    dfo.reset_index(drop=True, inplace=True)
+    dfo['average_rating']=dfo['average_rating'].round(2)
+    
+    #1. Check user input: rating
+    min_rating = rating[0]
+    max_rating = rating[1]
+    st.write('min_rating=',min_rating,'max_rating=',max_rating)
+    #df = df1[df1['average_rating'].between(min_rating, max_rating)]
+    #2. Check user input: page number
+    if isinstance(pages, int) is True: #pages True,av_rating=True immer, no_ratinsg True/False
+        df = dfo[dfo['pages']<=int(pages)]
+        df2 = df[df['average_rating'].between(min_rating, max_rating)]
+        if isinstance(no_ratings, int) is True:
+            df1 = df2[df2['total_number_ratings']>=int(no_ratings)]
+        else:
+            df1=df2.copy()    
+    else: #Pages False(nicht gefiltert),av_rating True immer, rating True/False
+        df3 = dfo[dfo['average_rating'].between(min_rating, max_rating)]
+        if isinstance(no_ratings, int) is True:
+            df1 = df3[df3['total_number_ratings']>=int(no_ratings)]
+        else:
+            df1=df3.copy()
+
+    st.write(df) 
+
+
+
+
+
+
+
+
+
+
+
+
+ #   feature_author = functionFuzzyAuthor(author)
+    #Function includes search similarity in column Author
+
+
+
+
+#year = st.sidebar.slider('Year', 1920, 1990,2021) #lowest value, default value, highest value
+#authors = st.text_input('Authors', '')
+
+
+
+
+
+
+
+
+
 
 
 
