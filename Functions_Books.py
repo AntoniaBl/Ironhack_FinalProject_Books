@@ -80,17 +80,27 @@ def combine_features(data):
 #Model
 
 #UserInput other title recommendations
-def suggestions_other_title(title_user):
-    choices = df1['title'] 
+def suggestions_other_title(title_user, dataframe):
+    choices = dataframe['title'] 
     # Get a list of matches ordered by score, default limit to 5
     rec = process.extract(title_user, choices)
-    print('This exact title was not found in the database. Did you mean one of these?')
+    #str1="This exact title was not found in the database. Did you mean one of these?"
+    #print()
+    j=0
+    dictionary1={}
     for i in rec:
-        print(i[0])
+        dictionary1["str{0}".format(i)] = str(j+1)+' ' + i[0] 
+        #str1 += "\n"
+        #str1 +=i[0]
+        j=j+1
+    a=list(dictionary1.values())[:5]
+    #suggestions = "This exact title was not found in the database. Did you mean one of these?\n", str(str1)
+    #x = str(str1)
+    return "This exact title was not found in the database. Did you mean one of these?",a[0],a[1],a[2],a[3],a[4],''
 
 #Assume book title if fuzzy ratio is above 95
-def assume_book_title(title_user):
-    choices = df1['title'] 
+def assume_book_title(title_user, dataframe):
+    choices = dataframe['title'] 
     # Get a list of matches ordered by score, default limit to 5
     rec = process.extract(title_user, choices)
     lst=[]
@@ -99,22 +109,20 @@ def assume_book_title(title_user):
         #print(i[1])
         if lst[0]>95:
             title_user=i[0]#list.sort(key=lst, reverse=True)
-            print('I did not find an exact match in the database. I assume you mean the book: ' + title_user)
-            give_5bookrecommendationsCount(title_user)
-            break
+            return 'I did not find an exact match in the database. I assume you mean the book: '+ title_user, give_5bookrecommendationsCount(title_user, dataframe)[0],give_5bookrecommendationsCount(title_user, dataframe)[1],give_5bookrecommendationsCount(title_user, dataframe)[2],give_5bookrecommendationsCount(title_user, dataframe)[3],give_5bookrecommendationsCount(title_user, dataframe)[4],give_5bookrecommendationsCount(title_user, dataframe)[5]#,give_5bookrecommendationsCount(title_user, dataframe)[6]
         else:
             error
     
 
 #Book Recommendations based on Wordcount
 
-def give_5bookrecommendationsCount(title_user):
+def give_5bookrecommendationsCount(title_user, dataframe):
     #1.Step - convert the description from combined_features to a matrix of word counts
-    cm = CountVectorizer().fit_transform(df1['combined_features'])
+    cm = CountVectorizer().fit_transform(dataframe['combined_features'])
     #2.Get the cosine_simmilarity from the count matrix
     cs = cosine_similarity(cm)
     #Get index of title of user input
-    indices = df1[df1.title == title_user].index.values[0]
+    indices = dataframe[dataframe.title == title_user].index.values[0]
     #Create a list of tuples in the form (index,similarity)
     scores = list(enumerate(cs[indices]))
     # Sort the list of similar books in descending order
@@ -122,23 +130,33 @@ def give_5bookrecommendationsCount(title_user):
     sorted_score = sorted_score[1:]
     # Create a loop to print the first 5 books from the sorted list
     j=0
-    print('The 5 most recommended books to '+title_user+' are:\n')
+    #print('The 5 most recommended books to '+title_user+' are:\n')
+    d={}
     for item in sorted_score:
-        book_title = df1[df1.index == item[0]]['title'].values[0]
-        print(j+1, book_title)
+        book_title = dataframe[dataframe.index == item[0]]['title'].values[0]
+        d["str{0}".format(item)] = str(j+1)+' ' + book_title 
+        #str{item}.append(str(j+1)+' ' + book_title + "\n")
+        #print(j+1, book_title)
         j=j+1
-        if j >=5:
-            break
+    f=list(d.values())[:5]
+    return 'The 5 most recommended books to '+ str(title_user)+' are:', f[0],f[1],f[2],f[3],f[4],''
 
 #Complete suggestion function -combines the 3 functions above
-def give_recommendationComplete(title_user):
+def give_recommendationComplete(title_user, dataframe):
     try:
-        give_5bookrecommendationsCount(title_user)
+        a = give_5bookrecommendationsCount(title_user, dataframe)
+        if a:
+            return a
     except:
         try:
-            assume_book_title(title_user)
+            b = assume_book_title(title_user, dataframe)
+            if b:
+                return b
         except:
-            suggestions_other_title(title_user)       
+            #print(3)
+            c= suggestions_other_title(title_user, dataframe) 
+            if c:
+                return c     
 
 
 
