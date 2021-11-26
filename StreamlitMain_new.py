@@ -9,7 +9,7 @@ from fuzzywuzzy import process
 
 #1. Header
 st.write('# No worries. He knows what you want to read next.')
-image = Image.open('image.jpeg') #save in the same folder
+image = Image.open('images\image.jpeg') #save in the same folder
 st.image(image, use_column_width=True)
 
 title_user = st.text_input('Please enter a title', '')
@@ -41,7 +41,7 @@ if submitted1:
     st.write('min_rating=',min_rating,'max_rating=',max_rating)
     #df = df1[df1['average_rating'].between(min_rating, max_rating)]
     #2. Check user input: page number
-    if isinstance(pages, int) is True: #pages True,av_rating=True immer, no_ratinsg True/False
+    if isinstance(pages, int) is True: #pages True,av_rating=True immer, no_ratings True/False
         df = dfo[dfo['pages']<=int(pages)]
         df2 = df[df['average_rating'].between(min_rating, max_rating)]
         if isinstance(no_ratings, int) is True:
@@ -55,49 +55,35 @@ if submitted1:
             df1 = df3[df3['total_number_ratings']>=int(no_ratings)]
         else:
             df1=df3.copy()
-            st.write(df1) 
-
-#2. Define Model Functions:
-#def suggestions_other_title(title_user, dataframe):
- #   choices = dataframe['title'] 
-    # Get a list of matches ordered by score, default limit to 5
-  #  rec = process.extract(title_user, choices)
-   # str1="This exact title was not found in the database. Did you mean one of these?"
-    #print()
-    #for i in rec:
-     #   str1 += "\n"
-        #str1 +=i[0]
-    #suggestions = "This exact title was not found in the database. Did you mean one of these?\n", str(str1)
-    #x = str(str1)
-    #return print(str1)
+    st.write(df1)   
+    
 
 if st.button('Predict'):
-    try: 
+    try:
         df1.reset_index(drop=True, inplace=True)
         recommendation = funct.give_recommendationComplete(title_user,df1)
         st.write(recommendation, 2)
-
     except:
         df1=pd.read_csv('DataFinal\DataPreprocessed.csv',index_col=0) #or feature output df, either filtered or original
         #reset index
         df1.reset_index(drop=True, inplace=True)
-        #df1=pd.read_csv('DataFinal\DataPreprocessed.csv',index_col=0) #or feature output df, either filtered or original
-        #reset index
         recommendation1 = funct.give_recommendationComplete(title_user, df1)
-        st.write(recommendation1[0])
+        st.write(recommendation1[0],1)
         st.write(recommendation1[1])
         st.write(recommendation1[2])
         st.write(recommendation1[3])
         st.write(recommendation1[4])
         st.write(recommendation1[5])
         st.write(recommendation1[6])
+
+
         
 
 
 
  #Still to do: 
- #include: if input= empty procees with model + link of book cover  + new lines
- #feature_author = functionFuzzyAuthor(author)
+ #include: if input= empty procees with model + link of book cover 
+ #  #feature_author = functionFuzzyAuthor(author)
     #Function includes search similarity in column Author
 #year = st.sidebar.slider('Year', 1920, 1990,2021) #lowest value, default value, highest value
 #authors = st.text_input('Authors', '')#
