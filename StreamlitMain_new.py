@@ -38,7 +38,7 @@ if submitted1:
     #1. Check user input: rating
     min_rating = rating[0]
     max_rating = rating[1]
-    st.write('min_rating=',min_rating,'max_rating=',max_rating)
+    #st.write('min_rating=',min_rating,'max_rating=',max_rating)
     #df = df1[df1['average_rating'].between(min_rating, max_rating)]
     #2. Check user input: page number
     if isinstance(pages, int) is True: #pages True,av_rating=True immer, no_ratings True/False
@@ -48,14 +48,14 @@ if submitted1:
             df1 = df2[df2['total_number_ratings']>=int(no_ratings)]
         else:
             df1=df2.copy() 
-            st.write(df1)   
+            #st.write(df1)   
     else: #Pages False(nicht gefiltert),av_rating True immer, rating True/False
         df3 = dfo[dfo['average_rating'].between(min_rating, max_rating)]
         if isinstance(no_ratings, int) is True:
             df1 = df3[df3['total_number_ratings']>=int(no_ratings)]
         else:
             df1=df3.copy()
-    st.write(df1)   
+    #st.write(df1)   
     
 
 if st.button('Predict'):
@@ -68,7 +68,7 @@ if st.button('Predict'):
         #reset index
         df1.reset_index(drop=True, inplace=True)
         recommendation1 = funct.give_recommendationComplete(title_user, df1)
-        st.write(recommendation1[0],1)
+        st.write(recommendation1[0])
         st.write(recommendation1[1])
         st.write(recommendation1[2])
         st.write(recommendation1[3])
