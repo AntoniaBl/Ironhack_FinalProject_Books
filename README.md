@@ -1,7 +1,7 @@
 ## Ironhack Data Analytics Bootcamp 
 # Final Project - Build a Book Recommender
 
-[Books?](images/image.jpg)
+![image](https://user-images.githubusercontent.com/82891947/143662547-22b09faf-730c-40f1-af54-22c9ff05cacf.jpeg)
 
 ## **Goal of the project**
 
@@ -27,10 +27,10 @@ The process was done in the following steps:
 
 ## **Special Libraries used**
 
-- [pandas]('https://pandas.pydata.org')
-- [NLTK]('https://www.nltk.org')
-- [sklearn.feature_extraction]('https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html')
+- [pandas](https://pandas.pydata.org)
+- [NLTK](https://www.nltk.org)
+- [sklearn.feature_extraction](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html)
 - fuzzywuzzy
-- [Streamlit]('https://streamlit.io')
+- [Streamlit](https://streamlit.io)
 
 ### Submitted on 27.11.2021
