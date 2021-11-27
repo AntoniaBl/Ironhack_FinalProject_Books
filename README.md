@@ -18,8 +18,8 @@ The process was done in the following steps:
 
 1.  Webscraping using BeautifulSoup
 2.  General Data Cleaning
-3.  Data preprocessing for the recommendation model:
-    3.1 Tokenizing with NLTK
+3.  Data preprocessing for the recommendation model: <br>
+    3.1 Tokenizing with NLTK <br>
     3.2 Use sklearn CountVectorizer and cosine_similarity to receive the recommendations based on the frequency of words in the description
 4.  User Input handling: Use fuzzywuzzy to assign the user input to the right title in the database
 5.  Set up Streamlit for presentational purposes of the model and to include other features that can be chosen by the user
